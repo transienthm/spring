@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+        配置bean
+        class：bean的全类名，通过反射的方式在IOC容器中创建Bean，所以要求Bean中必须有无参数的构造器
+        id: 标识容器中的bean，id唯一，若 id 没有指定，Spring 自动将权限定性类名作为 Bean 的名字
+            id 可以指定多个名字，名字之间可用逗号、分号、或空格分隔
+    -->
+    <bean id="helloWorld" class="com.meituan.spring.beans.HelloWorld">
+       <property name="name" value="Spring"></property>
+    </bean>
+</beans>
