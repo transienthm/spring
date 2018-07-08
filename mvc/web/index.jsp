@@ -6,5 +6,12 @@
   </head>
   <body>
     <a href="/helloworld">hello world!</a>
+
+    <br/><br/>
+
+    <form action="/testRest" method="post">
+      <input type="hidden" name="_method" value="DELETE">
+      <input type="submit" value="TestRest DELETE">
+    </form>
   </body>
 </html>

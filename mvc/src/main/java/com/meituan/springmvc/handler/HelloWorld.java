@@ -1,8 +1,11 @@
 package com.meituan.springmvc.handler;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.servlet.View;
+
+import java.util.Map;
 
 /**
  * 描述:
@@ -19,4 +22,31 @@ public class HelloWorld {
         System.out.println("hello world, hello springmvc !");
         return "success";
     }
+
+    @RequestMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Integer id) {
+        System.out.println(id);
+        return "redirect:/user/list.action";
+    }
+
+    @RequestMapping(value = "/testRest", method = RequestMethod.DELETE)
+    public String testDelete() {
+        System.out.println("delete rest");
+        ModelAndView modelAndView = new ModelAndView();
+        View view = new View() {
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public void render(Map<String, ?> map, javax.servlet.http.HttpServletRequest httpServletRequest, javax.servlet.http.HttpServletResponse httpServletResponse) throws Exception {
+
+            }
+        };
+        modelAndView.setView(view);
+        return "success";
+    }
+
+
 }
