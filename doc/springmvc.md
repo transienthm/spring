@@ -660,6 +660,8 @@ SpringMVC通过反射机制对目标处理方法进行解析，将请求消息�
 - JSR 303是Java为Bean数据合法性校验提供的标准框架，它已经包含在JavaEE 6.0中
 - JSR 303通过在Bean属性上标注类似于@NotNull、@Max等标准的注解指定校验规则，并通过标准的验证接口对Bean进行验证
 
+![wx20180721-183913 2x](https://user-images.githubusercontent.com/16509581/43034901-a568e122-8d17-11e8-8e0e-c4d71bf8f98e.png)
+
 ### 7.3.2 SpringMVC数据校验
 
 - Spring 4.0拥有自己独立的数据校验框架，同时支持JSR 303标准的校验框架。
