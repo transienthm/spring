@@ -1,5 +1,7 @@
 package com.sankuai.meituan.tomcat;
 
+import com.sankuai.meituan.servlet.HttpServlet;
+
 import java.util.Map;
 
 /**
@@ -11,6 +13,11 @@ public class Request {
     private String method;
     private String parameter;
     private Map<String, String> attribute;
+
+
+    public HttpServlet initServlet() {
+        return ServletContainer.getHttpServlet(path);
+    }
 
     public String getPath() {
         return path;
