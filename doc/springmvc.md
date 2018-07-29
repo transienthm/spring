@@ -481,8 +481,8 @@ org.springframework.web.HttpSessionRequiredException: Session attribute 'user' r
 ![image](https://user-images.githubusercontent.com/16509581/42732417-d288a3e0-8853-11e8-8986-2e26d3089c06.png)
 
 - 请求处理方法执行完成后，最终返回一个ModelAndView 对象。对于那些返回String, View或ModeMap等类型的处理方法，**Spring MVC也会在内部将它们装配成一个 ModelAndView对象**，它包含了逻辑名和模型对象的视图 
-- SpringMVC借助视图解析器（ViewResolver)得到最终 白七视图对象（View)，最终的视图可以是JSP，也可能是 Excel、JFreeChart等各种表现形式的视图 
-- 对于最终究竟采取何种视图对象对模型数据进行渲染，处 理器并不关心，处理器工作重点聚焦在生产模型数据的工 作上，从而实现MVC的充分解耦
+- SpringMVC借助视图解析器（ViewResolver)得到最终的视图对象（View)，最终的视图可以是JSP，也可能是 Excel、JFreeChart等各种表现形式的视图 
+- 对于最终究竟采取何种视图对象对模型数据进行渲染，处理器并不关心，处理器工作重点聚焦在生产模型数据的工作上，从而实现MVC的充分解耦
 
 ### 5.6.2 视图
 
@@ -686,3 +686,108 @@ SpringMVC通过反射机制对目标处理方法进行解析，将请求消息�
 - 隐含模型中的所有数据最终将通过 Http Servletrequest的属性列表暴露给 JSP 视图对象,因此在 JSP 中可以获取错误信息 
 - 在JSP页面上可通过`<form:errors path="userName">`显示错误消息
 
+# 8、文件上传
+
+- Spring MVC为文件上传提供了直接的支持，这种支持是通过即插即用的MultipartResolver实现的。 Spring用 Jakarta Commons FileUpload 技术实现了一个 MultipartResolver 实现类：CommonsMultipartResovler
+-  Spring MVC上下文中默认没有装配MultipartResovler，因此默认情况下不能处理文件的上传工作，如果想使用Spring 的文件上传功能，需现在上下文中配置MultipartResolver
+
+## 配置MultipartResolver
+
+- defaultEncoding:必须和用户 JSP 的 pageEncoding 属性 一致，以便正确解析表单的内容 
+- 为了让 CommonsMultipartResovler正确工作，必须先将 Jakarta Commons FileUpload & Jakarta Commons io 的类包添加到类路径下。 
+
+# 9、拦截器
+
+- Spring MVC也可以使用拦截器对请求进行拦截处理，用户 可以自定义拦截器来实现特定的功能，自定义的拦截器必须实现 Handlerlnterceptor 接口 
+  - preHandle():这个方法在业务处理器处理请求之前被调用，在该 方法中对用户请求request进行处理。**如果程序员决定该拦截器对 请求进行拦截处理后还要调用其他的拦截器，或者是业务处理器去 进行处理，则返回true ;如果程序员决定不需要再调用其他的组件 去处理请求，则返回false**。
+  - postHandle():**这个方法在业务处理器处理完请求后，但是DispatcherServlet向客户端返回响应前被调用**，在该方法中对用户请求request进行处理。
+  - afterCompletion():**这个方法在 DispatcherServlet 完全处理完请求后被调用**，可以在该方法中进行一些资源清理的操作。
+
+- 􏲨􏲩􏱗拦截器方法执行顺序
+
+![image](https://user-images.githubusercontent.com/16509581/43362416-2c793478-931c-11e8-855a-7d57d2d6dba0.png)
+
+- 拦截器配置
+
+  ![image](https://user-images.githubusercontent.com/16509581/43362446-e256b554-931c-11e8-8a78-67da10f97916.png)
+
+- 多个拦截器的执行顺序
+
+  ![image](https://user-images.githubusercontent.com/16509581/43362457-1259abf8-931d-11e8-911a-03700c69d50b.png)
+  ![image](https://user-images.githubusercontent.com/16509581/43362460-2483e29e-931d-11e8-9b82-0f15cb53aed0.png)
+
+# 9、 异常处理
+
+- Spring MVC通过 HandlerExceptionResolver 处理程序的异常，包括Handler映射、数据绑定以及目标方法执行时发生的异常
+- Spring MVC提供的 HandlerExceptionResolver 的实现类
+
+## 9.1 HandlerExceptionResolver
+
+- DispatcherServlet 默认装配的HandlerExceptionResolver
+
+  - 没有使用`<mvc:annotation-driven/>`配置
+
+    ![image](https://user-images.githubusercontent.com/16509581/43362528-e4c9ed72-931e-11e8-97e0-122ff08aa21b.png)
+
+  - 使用`<mvc:annotation-driven/>`配置
+
+    
+    ![image](https://user-images.githubusercontent.com/16509581/43362530-ec1a3c44-931e-11e8-9487-9d77de076f5e.png)
+
+    
+
+## 9.2 ExceptionHandlerExceptionResolver 
+
+- 主要处理Handler中用@ExceptionHandler注解定义的方法。 
+- @ExceptionHandler注解定义的方法优先级问题：例如发生的是NullPointerException，但是声明的异常有 RuntimeException和Exception,此时会根据异常的最近继承关系找到继承深度最浅的那个@ExceptionHandler 注解方法，即标记了 RuntimeException的方法 
+- ExceptionHandlerMethodResolver 内部若找不到@ExceptionHandler注解的话，会找 **@ControllerAdvice** 中的**@ExceptionHandler** 注解方法
+
+## 9.3 ResponseStatusExceptionResolver
+
+- 在异常及异常父类中找到@ResponseStatus注解，然后使用这个注解的属性进行处理。 
+- 定义一个@ResponseStatus注解修饰的异常类 
+- 若在处理器方法中拋出了上述异常： 若 ExceptionHandlerExceptionResolver 不解析上述异常。由于触发的异常 UnauthorizedException 带有@ResponseStatus 注解。因此会被 ResponseStatusExceptionResolver 解析到。最后响应HttpStatus_UNAUTH〇RIZED代码给客户端。HttpStatus_UNAUTH〇RIZED代表响应码401，无权限。 关于其他的响应码请参考HttpStatus枚举类型源码。
+
+## 9.4 DefaultHandlerExceptionResolver
+
+对一些特殊的异常进行处理，比如NoSuchRequestHandlingMethodException、 HttpReques tMethodNotSupportedException、 HttpMediaTypeNotSuppo rtedException、 HttpMediaTypeNotAcceptableException 等
+
+## 9.5 SimpleMappingExceptionResolver
+
+如果希望对所有异常进行统一处理，可以使用SimpleMappingExceptionResolver，它将异常类名映射为视图名，即发生异常时使用对应的视图报告异常
+
+![image](https://user-images.githubusercontent.com/16509581/43362874-0309196c-9328-11e8-9bc4-876dde1a6dd0.png)
+
+# 10、SpringMVC运行流程
+
+![image](https://user-images.githubusercontent.com/16509581/43362882-3b40ae3a-9328-11e8-9654-d0bc11e96662.png)
+
+# 11、在Spring环境下使用SpringMVC
+
+需要进行Spring 整合SpringMVC吗
+
+还是否需要再加入Spring的IOC容器？
+
+是否需要在web.xml文件中配置启动Spring IOC容器的ContextLoaderListener？
+
+1. 需要：通常情况下，类似于数据源、事务、整合其他框架都是放在Spring 的配置文件中（而不是放在SpringMVC的配置文件中），实际上放入Spring配置文件对应的IOC容器中的还有Service和Dao（推荐）
+2. 不需要：都放在SpringMVC的配置文件中，也可以分多个Spring的配置文件，然后使用import节点导入其他的配置文件（不推荐）
+
+## 11.1 Bean的重复创建
+
+若Spring的IOC容器和SpringMVC的IOC容器扫描的包有重合的部分，就会导致有的bean会被创建2次
+
+解决：
+
+1. 使Spring的IOC容器扫描的包和SpringMVC的IOC容器扫描的包没有重合的部分
+
+2. 使用 exclude-filter 和 include-filter 子节点来规定只能扫描的注解
+
+   ![image](https://user-images.githubusercontent.com/16509581/43366435-a8f287da-9370-11e8-8d08-6340e23f2595.png)
+
+## 11.2 SpringMVC与Spring容器的关系
+
+- 多个Spring l〇C容器之间可以设置为父子关系，以实现良好的解耦。 
+- Spring MVC WEB层容器可作为“业务层” Spring 容器的子容器：即WEB层容器可以引用业务层容器的Bean,而业务层容器却访问不到WEB层容器的Bean
+
+![image](https://user-images.githubusercontent.com/16509581/43366462-0c3c75e4-9371-11e8-8416-f88f457c7ddd.png)
