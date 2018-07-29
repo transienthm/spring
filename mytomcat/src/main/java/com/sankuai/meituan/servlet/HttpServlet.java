@@ -5,5 +5,4 @@ package com.sankuai.meituan.servlet;
  * @see(功能介绍)
  */
 public abstract class HttpServlet {
-    public
 }
